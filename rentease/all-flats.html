@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RentEase - All Flats</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card fade-in">
+        <h2>All Flats 🏘️</h2>
+        <div class="filters">
+          <input type="text" id="cityFilter" placeholder="Filter by City" />
+          <input type="number" id="minPrice" placeholder="Min Price" />
+          <input type="number" id="maxPrice" placeholder="Max Price" />
+          <input type="number" id="minArea" placeholder="Min Area (sqm)" />
+          <input type="number" id="maxArea" placeholder="Max Area (sqm)" />
+          <input
+            type="number"
+            id="yearBuiltFilter"
+            placeholder="Built After (Year)"
+          />
+          <div class="checkbox-group">
+            <input type="checkbox" id="hasACFilter" />
+            <label for="hasACFilter">Has AC ? ❄️</label>
+          </div>
+          <button id="applyFilters">Apply</button>
+        </div>
+        <div class="table-responsive">
+          <table id="flatsTable">
+            <thead>
+              <tr>
+                <th>City 🏙️</th>
+                <th>Street 🛣️</th>
+                <th>Area Size 📐</th>
+                <th>Rent Price 💵</th>
+                <th>Built Year 🛠️</th>
+                <th>AC ❄️</th>
+                <th>Actions ⚡</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="pagination"></div>
+    </div>
+    <script src="./js/common.js"></script>
+    <script src="./js/interraction.js"></script>
+    <script src="./js/all-flats.js"></script>
+  </body>
+</html>

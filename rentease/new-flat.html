@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RentEase - Add Flat</title>
+    <link rel="stylesheet" href="./css/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card fade-in">
+        <h2>Add New Flat 📌</h2>
+        <form id="flatForm">
+          <div class="form-group">
+            <label>🏙️ City:</label>
+            <input type="text" id="city" required />
+          </div>
+          <div class="form-group">
+            <label>🛣️ Street Name:</label>
+            <input type="text" id="streetName" required />
+          </div>
+          <div class="form-group">
+            <label>🔢 Street Number:</label>
+            <input type="number" id="streetNumber" required />
+          </div>
+          <div class="form-group">
+            <label>📐 Area Size (sqm):</label>
+            <input type="number" id="areaSize" required />
+          </div>
+          <div class="form-group">
+            <label>💵 Rent Price:</label>
+            <input type="number" id="rentPrice" required />
+          </div>
+
+          <div class="form-group">
+            <label>🛠️ Year Built:</label>
+            <input type="number" id="yearBuilt" required />
+          </div>
+
+          <div class="form-group checkbox-group">
+            <input type="checkbox" id="hasAC" />
+            <label for="hasAC">❄️ Has Air Conditioning ?</label>
+          </div>
+
+          <button type="submit">Save Flat</button>
+        </form>
+      </div>
+    </div>
+    <script src="./js/common.js"></script>
+    <script src="./js/interraction.js"></script>
+    <script src="./js/new-flat.js"></script>
+  </body>
+</html>
