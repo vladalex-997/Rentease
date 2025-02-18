@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let editingFlatId = null;
 let currentPage = 1;
-const flatsPerPage = 1;
+const flatsPerPage = 3;
 
 let filterValues = {
   city: "",
