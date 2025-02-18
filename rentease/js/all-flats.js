@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("applyFilters")
     .addEventListener("click", filterFlats);
+
   document.querySelectorAll("#flatsTable th[data-sort]").forEach((th) => {
     th.addEventListener("click", () => sortFlats(th.getAttribute("data-sort")));
   });
@@ -23,10 +24,13 @@ let filterValuesFlats = {
   hasAC: false,
 };
 
+let sortColumnFlats = null;
+let sortDirectionFlats = "asc";
+
 function renderFlats(filteredFlats = null) {
   const flats = filteredFlats || DB.getFlats();
 
-  const filteredWithValues = flats.filter((flat) => {
+  let filteredWithValues = flats.filter((flat) => {
     return (
       flat.city.toLowerCase().includes(filterValuesFlats.city) &&
       flat.rentPrice >= filterValuesFlats.minPrice &&
@@ -38,8 +42,21 @@ function renderFlats(filteredFlats = null) {
     );
   });
 
-  const totalPages = Math.ceil(filteredWithValues.length / flatsPerPage);
+  if (sortColumnFlats) {
+    filteredWithValues.sort((a, b) => {
+      let valueA = a[sortColumnFlats];
+      let valueB = b[sortColumnFlats];
 
+      if (typeof valueA === "string") valueA = valueA.toLowerCase();
+      if (typeof valueB === "string") valueB = valueB.toLowerCase();
+
+      if (valueA < valueB) return sortDirectionFlats === "asc" ? -1 : 1;
+      if (valueA > valueB) return sortDirectionFlats === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
+  const totalPages = Math.ceil(filteredWithValues.length / flatsPerPage);
   const startIndex = (currentPageFlats - 1) * flatsPerPage;
   const endIndex = startIndex + flatsPerPage;
   const flatsToDisplay = filteredWithValues.slice(startIndex, endIndex);
@@ -106,14 +123,28 @@ function filterFlats() {
   filterValuesFlats.hasAC = document.getElementById("hasACFilter").checked;
 
   currentPageFlats = 1;
-
   renderFlats();
 }
 
 function sortFlats(key) {
-  const flats = DB.getFlats();
-  flats.sort((a, b) => (a[key] > b[key] ? 1 : -1));
-  renderFlats(flats);
+  if (sortColumnFlats === key) {
+    sortDirectionFlats = sortDirectionFlats === "asc" ? "desc" : "asc";
+  } else {
+    sortColumnFlats = key;
+    sortDirectionFlats = "asc";
+  }
+
+  document.querySelectorAll("#flatsTable th[data-sort]").forEach((th) => {
+    th.innerHTML = th.innerHTML.replace(/( 🔼| 🔽)/g, "");
+  });
+
+  const header = document.querySelector(`#flatsTable th[data-sort="${key}"]`);
+  if (header) {
+    header.innerHTML += sortDirectionFlats === "asc" ? " 🔼" : " 🔽";
+  }
+
+  currentPageFlats = 1;
+  renderFlats();
 }
 
 function renderPaginationControls(totalPages) {

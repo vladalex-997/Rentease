@@ -6,6 +6,12 @@ document.addEventListener("DOMContentLoaded", () => {
   document
     .getElementById("applyFilters")
     .addEventListener("click", filterFavorites);
+
+  document.querySelectorAll("#favoritesTable th[data-sort]").forEach((th) => {
+    th.addEventListener("click", () => {
+      sortFavorites(th.getAttribute("data-sort"));
+    });
+  });
 });
 
 let currentPageFavorites = 1;
@@ -20,13 +26,18 @@ let filterValuesFavorites = {
   hasAC: false,
 };
 
+let sortColumnFavorites = null;
+let sortDirectionFavorites = "asc";
+
 function renderFavorites(filteredFlats = null) {
   const user = DB.getCurrentUser();
   const flats = DB.getFlats();
-  const favorites = flats.filter((flat) => user.favorites.includes(flat.id));
-  const filtered = filteredFlats || favorites;
 
-  const filteredWithValues = filtered.filter((flat) => {
+  const favorites = flats.filter((flat) => user.favorites.includes(flat.id));
+
+  let filtered = filteredFlats || favorites;
+
+  let filteredWithValues = filtered.filter((flat) => {
     return (
       flat.city.toLowerCase().includes(filterValuesFavorites.city) &&
       flat.rentPrice >= filterValuesFavorites.minPrice &&
@@ -38,8 +49,21 @@ function renderFavorites(filteredFlats = null) {
     );
   });
 
-  const totalPages = Math.ceil(filteredWithValues.length / favoritesPerPage);
+  if (sortColumnFavorites) {
+    filteredWithValues.sort((a, b) => {
+      let valueA = a[sortColumnFavorites];
+      let valueB = b[sortColumnFavorites];
 
+      if (typeof valueA === "string") valueA = valueA.toLowerCase();
+      if (typeof valueB === "string") valueB = valueB.toLowerCase();
+
+      if (valueA < valueB) return sortDirectionFavorites === "asc" ? -1 : 1;
+      if (valueA > valueB) return sortDirectionFavorites === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
+
+  const totalPages = Math.ceil(filteredWithValues.length / favoritesPerPage);
   const startIndex = (currentPageFavorites - 1) * favoritesPerPage;
   const endIndex = startIndex + favoritesPerPage;
   const flatsToDisplay = filteredWithValues.slice(startIndex, endIndex);
@@ -54,14 +78,18 @@ function renderFavorites(filteredFlats = null) {
 
     const row = document.createElement("tr");
     row.innerHTML = `
-            <td>${flat.city}</td>
-            <td>${flat.streetName} ${flat.streetNumber}</td>
-            <td>${flat.areaSize} sqm</td>
-            <td>$${flat.rentPrice}</td>
-            <td>${acIcon}</td>
-            <td>${flat.yearBuilt}</td>
-            <td><button class="danger" onclick="removeFavorite('${flat.id}')">Remove from Favorites</button></td>
-        `;
+      <td>${flat.city}</td>
+      <td>${flat.streetName} ${flat.streetNumber}</td>
+      <td>${flat.areaSize} sqm</td>
+      <td>$${flat.rentPrice}</td>
+      <td>${acIcon}</td>
+      <td>${flat.yearBuilt}</td>
+      <td>
+        <button class="danger" onclick="removeFavorite('${flat.id}')">
+          Remove from Favorites
+        </button>
+      </td>
+    `;
     tbody.appendChild(row);
   });
 
@@ -96,7 +124,29 @@ function filterFavorites() {
   filterValuesFavorites.hasAC = document.getElementById("hasACFilter").checked;
 
   currentPageFavorites = 1;
+  renderFavorites();
+}
 
+function sortFavorites(key) {
+  if (sortColumnFavorites === key) {
+    sortDirectionFavorites = sortDirectionFavorites === "asc" ? "desc" : "asc";
+  } else {
+    sortColumnFavorites = key;
+    sortDirectionFavorites = "asc";
+  }
+
+  document.querySelectorAll("#favoritesTable th[data-sort]").forEach((th) => {
+    th.innerHTML = th.innerHTML.replace(/( 🔼| 🔽)/g, "");
+  });
+
+  const header = document.querySelector(
+    `#favoritesTable th[data-sort="${key}"]`
+  );
+  if (header) {
+    header.innerHTML += sortDirectionFavorites === "asc" ? " 🔼" : " 🔽";
+  }
+
+  currentPageFavorites = 1;
   renderFavorites();
 }
 

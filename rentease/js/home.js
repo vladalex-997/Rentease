@@ -22,12 +22,16 @@ let filterValues = {
   hasAC: false,
 };
 
+let sortColumn = null;
+let sortDirection = "asc";
+
 function renderAllFlats(filteredFlats = null) {
   const user = DB.getCurrentUser();
   const flats = DB.getFlats();
-  const filtered = filteredFlats || flats;
 
-  const filteredWithValues = filtered.filter((flat) => {
+  let flatsToProcess = filteredFlats || flats;
+
+  let filteredWithValues = flatsToProcess.filter((flat) => {
     return (
       flat.ownerId === user.id &&
       flat.city.toLowerCase().includes(filterValues.city) &&
@@ -39,6 +43,20 @@ function renderAllFlats(filteredFlats = null) {
       (!filterValues.hasAC || flat.hasAC)
     );
   });
+
+  if (sortColumn) {
+    filteredWithValues.sort((a, b) => {
+      let valueA = a[sortColumn];
+      let valueB = b[sortColumn];
+
+      if (typeof valueA === "string") valueA = valueA.toLowerCase();
+      if (typeof valueB === "string") valueB = valueB.toLowerCase();
+
+      if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
+      if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
 
   const totalPages = Math.ceil(filteredWithValues.length / flatsPerPage);
   const startIndex = (currentPage - 1) * flatsPerPage;
@@ -153,7 +171,6 @@ function filterFlats() {
   filterValues.hasAC = document.getElementById("hasACFilter").checked;
 
   currentPage = 1;
-
   renderAllFlats();
 }
 
@@ -222,4 +239,25 @@ function renderPaginationControls(totalPages) {
   });
 
   pagination.appendChild(nextButton);
+}
+
+function sortFlats(column) {
+  if (sortColumn === column) {
+    sortDirection = sortDirection === "asc" ? "desc" : "asc";
+  } else {
+    sortColumn = column;
+    sortDirection = "asc";
+  }
+
+  document.querySelectorAll("th").forEach((th) => {
+    th.innerHTML = th.innerHTML.replace(/( 🔼| 🔽)/g, "");
+  });
+
+  const header = document.querySelector(`th[onclick="sortFlats('${column}')"]`);
+  if (header) {
+    header.innerHTML += sortDirection === "asc" ? " 🔼" : " 🔽";
+  }
+
+  currentPage = 1;
+  renderAllFlats();
 }
